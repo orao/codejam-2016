@@ -11,6 +11,9 @@ often for Project Euler problems.
 */
 #include <vector>
 #include <cmath>
+#include <boost/multiprecision/cpp_int.hpp>
+
+namespace mp = boost::multiprecision;
 
 // Checks if a number is prime using a sort-of prime sieve
 template<typename T>
@@ -51,10 +54,10 @@ T is_prime_sieve(T num, T limit) {
     return num;
 }
 
-uint64_t to_base(uint64_t binary_digits, int base)
+mp::uint128_t to_base(mp::uint128_t binary_digits, int base)
 {
-    uint64_t num = 0;
-    for (uint64_t value = 1; binary_digits; binary_digits >>= 1)
+    mp::uint128_t num = 0;
+    for (mp::uint128_t value = 1; binary_digits; binary_digits >>= 1)
     {
         num += ( binary_digits & 1 ) ? value : 0;
         value *= base;
@@ -63,17 +66,17 @@ uint64_t to_base(uint64_t binary_digits, int base)
     return num;
 }
 
-uint64_t make_jamcoin(uint64_t inner_digits, int length)
+mp::uint128_t make_jamcoin(mp::uint128_t inner_digits, int length)
 {
-    uint64_t mask = ((1 << (length - 3)) - 1) << 1;
+    mp::uint128_t mask = ((1 << (length - 3)) - 1) << 1;
     return (1 << (length - 1)) | ((inner_digits << 1) & mask) | 1;
 }
 
-std::string to_string(uint64_t jamcoin, int length)
+std::string to_string(mp::uint128_t jamcoin, int length)
 {
     std::string rv;
     
-    for (unsigned mask = (1 << (length - 1)); mask > 0; mask >>=1)
+    for (mp::uint128_t mask = (1 << (length - 1)); mask > 0; mask >>=1)
     {
         rv += '0' + !!(mask & jamcoin);
     }
@@ -100,14 +103,14 @@ int main()
             return 1;
         }
         
-        uint64_t sieve_limit = 1000;
-        uint64_t inner_digits = 0;
-        std::vector<uint64_t> printed_inner_digits;
+        mp::uint128_t sieve_limit = 1000;
+        mp::uint128_t inner_digits = 0;
+        std::vector<mp::uint128_t> printed_inner_digits;
         for (int j = 0; j < count;)
         {
-            uint64_t candidate;
+            mp::uint128_t candidate;
             bool is_jamcoin = false;
-            std::vector<uint64_t> divisors;
+            std::vector<mp::uint128_t> divisors;
             for (; !is_jamcoin; ++inner_digits)
             {
                 if (std::find(printed_inner_digits.begin(), printed_inner_digits.end(), inner_digits) != printed_inner_digits.end())
@@ -119,8 +122,8 @@ int main()
                 divisors.clear();
                 for (int k = 2; k <= 10; ++k)
                 {
-                    uint64_t num = to_base(candidate, k);
-                    uint64_t divisor = is_prime_sieve<uint64_t>(num, sieve_limit);
+                    mp::uint128_t num = to_base(candidate, k);
+                    mp::uint128_t divisor = is_prime_sieve<mp::uint128_t>(num, sieve_limit);
                     if (divisor == num)
                     {
                         is_jamcoin = false;
